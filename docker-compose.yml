@@ -42,10 +42,8 @@ services:
     networks:
       - app_network
     depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mysql
+      - redis
     environment:
       - APP_ENV=${APP_ENV:-local}
       - APP_DEBUG=${APP_DEBUG:-true}
@@ -91,10 +89,8 @@ services:
     networks:
       - app_network
     depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mysql
+      - redis
     environment:
       - APP_ENV=${APP_ENV:-local}
       - DB_HOST=mysql
