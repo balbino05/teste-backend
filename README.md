@@ -22,10 +22,9 @@ O projeto foi desenvolvido seguindo os princípios SOLID e Design Patterns, com 
 ## 🚀 Tecnologias
 
 - **PHP 8.1+**
-- **Slim Framework 4**: Framework web minimalista
-- **Doctrine DBAL**: Abstração de banco de dados
+- **Laravel 10**: Framework PHP moderno e robusto
+- **Eloquent ORM**: ORM elegante para banco de dados
 - **Guzzle HTTP**: Cliente HTTP para serviços externos
-- **Monolog**: Logging
 - **PHPUnit**: Testes unitários e de integração
 - **Docker**: Containerização
 
@@ -53,16 +52,19 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-4. Instale as dependências (se necessário):
+4. Instale as dependências e configure:
 ```bash
 docker-compose exec php-cli composer install
+docker-compose exec php-cli php artisan key:generate
+docker-compose exec php-cli php artisan migrate
+docker-compose exec php-cli php artisan db:seed
 ```
 
 5. A aplicação estará disponível em: `http://localhost:8000`
 
 ## 📝 Endpoints
 
-### POST /transfer
+### POST /api/transfer
 
 Realiza uma transferência entre dois usuários.
 
