@@ -69,16 +69,28 @@ class Transaction extends Model
         return $this->status === Status::REVERSED;
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeCompleted($query)
     {
         return $query->where('status', Status::COMPLETED);
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeFailed($query)
     {
         return $query->where('status', Status::FAILED);
     }
 
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopePending($query)
     {
         return $query->where('status', Status::PENDING);

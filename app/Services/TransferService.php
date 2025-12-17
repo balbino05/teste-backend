@@ -9,7 +9,6 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Services\External\AuthorizationServiceInterface;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 

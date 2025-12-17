@@ -27,7 +27,7 @@
     "scripts": {
         "test": "phpunit",
         "pint": "pint",
-        "phpstan": "phpstan analyse",
+        "phpstan": "vendor/bin/phpstan analyse",
         "analyse": [
             "@phpstan",
             "@pint"
