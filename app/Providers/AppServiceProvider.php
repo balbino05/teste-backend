@@ -17,14 +17,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(AuthorizationServiceInterface::class, function ($app) {
             return new AuthorizationService(
                 new Client(),
-                config('services.authorize.url')
+                config('services.authorize.url', 'https://util.devi.tools/api/v2/authorize')
             );
         });
 
         $this->app->singleton(NotificationServiceInterface::class, function ($app) {
             return new NotificationService(
                 new Client(),
-                config('services.notify.url')
+                config('services.notify.url', 'https://util.devi.tools/api/v1/notify')
             );
         });
 
