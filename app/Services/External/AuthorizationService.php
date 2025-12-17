@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\External;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AuthorizationService implements AuthorizationServiceInterface
 {
     public function __construct(
-        private Client $httpClient,
         private string $authorizeUrl
     ) {
     }
@@ -19,13 +17,10 @@ class AuthorizationService implements AuthorizationServiceInterface
     public function authorize(): bool
     {
         try {
-            $response = $this->httpClient->get($this->authorizeUrl, [
-                'timeout' => 5,
-                'http_errors' => false,
-            ]);
+            $response = Http::timeout(5)->get($this->authorizeUrl);
 
-            $statusCode = $response->getStatusCode();
-            $body = json_decode($response->getBody()->getContents(), true);
+            $statusCode = $response->status();
+            $body = $response->json();
 
             Log::info('Authorization service response', [
                 'status_code' => $statusCode,
@@ -37,7 +32,7 @@ class AuthorizationService implements AuthorizationServiceInterface
             }
 
             return false;
-        } catch (GuzzleException $e) {
+        } catch (\Exception $e) {
             Log::error('Authorization service error', [
                 'message' => $e->getMessage(),
             ]);
