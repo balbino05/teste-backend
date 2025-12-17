@@ -51,6 +51,7 @@ jobs:
           mkdir -p storage/framework/{sessions,views,cache}
           mkdir -p storage/logs
           mkdir -p bootstrap/cache
+          mkdir -p resources/views
 
       - name: Directory Permissions
         run: chmod -R 755 storage bootstrap/cache
@@ -124,6 +125,7 @@ jobs:
           mkdir -p storage/framework/{sessions,views,cache}
           mkdir -p storage/logs
           mkdir -p bootstrap/cache
+          mkdir -p resources/views
 
       - name: Directory Permissions
         run: chmod -R 755 storage bootstrap/cache

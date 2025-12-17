@@ -31,18 +31,26 @@ class TransferController extends Controller
                 'message' => 'Transfer completed successfully',
             ], 201);
         } catch (\DomainException $e) {
-            Log::warning('Transfer validation error', [
-                'error' => $e->getMessage(),
-            ]);
+            try {
+                Log::warning('Transfer validation error', [
+                    'error' => $e->getMessage(),
+                ]);
+            } catch (\Exception $logException) {
+                // Ignora erros de log
+            }
 
             return response()->json([
                 'error' => $e->getMessage(),
             ], 400);
         } catch (\Exception $e) {
-            Log::error('Transfer error', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            try {
+                Log::error('Transfer error', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            } catch (\Exception $logException) {
+                // Ignora erros de log
+            }
 
             return response()->json([
                 'error' => 'An error occurred while processing the transfer',
