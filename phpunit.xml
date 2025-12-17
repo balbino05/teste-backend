@@ -28,6 +28,8 @@
     </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="APP_KEY" value="base64:testkey123456789012345678901234567890123456789012345678901234567890="/>
         <env name="DB_CONNECTION" value="mysql" force="false"/>
         <env name="DB_DATABASE" value="teste_db" force="false"/>
         <env name="DB_HOST" value="127.0.0.1" force="false"/>
@@ -36,6 +38,7 @@
         <env name="DB_PASSWORD" value="root_password" force="false"/>
         <env name="CACHE_DRIVER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
         <env name="REDIS_HOST" value="127.0.0.1" force="false"/>
         <env name="REDIS_PORT" value="6379" force="false"/>
     </php>
