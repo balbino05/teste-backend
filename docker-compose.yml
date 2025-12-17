@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: picpay_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - picpay_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: picpay_nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - picpay_network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: picpay_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: picpay_db
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: picpay_user
+      MYSQL_PASSWORD: picpay_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - picpay_network
+
+  php-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: picpay_php_cli
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    command: php -S 0.0.0.0:8000 -t public
+    ports:
+      - "8000:8000"
+    networks:
+      - picpay_network
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=picpay_db
+      - DB_USER=picpay_user
+      - DB_PASS=picpay_password
+
+networks:
+  picpay_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+
