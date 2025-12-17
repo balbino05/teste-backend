@@ -188,18 +188,18 @@ docker-compose exec php-cli vendor/bin/phpunit
 - ✅ Validações de negócio
 - ✅ Integração resiliente com serviços externos
 
-## 📈 Melhorias Futuras
+## 📈 Melhorias Implementadas
 
-- [ ] Implementar cache (Redis) para consultas frequentes
-- [ ] Adicionar fila de mensageria para notificações assíncronas
-- [ ] Implementar CQRS para separar leitura e escrita
-- [ ] Adicionar observabilidade (Prometheus, Grafana)
-- [ ] Implementar rate limiting
-- [ ] Adicionar autenticação e autorização (JWT)
-- [ ] Implementar testes de integração end-to-end
-- [ ] Adicionar CI/CD pipeline
-- [ ] Implementar retry policy para serviços externos
-- [ ] Adicionar documentação OpenAPI/Swagger
+- ✅ Cache Redis para consultas frequentes
+- ✅ Fila de mensageria para notificações assíncronas (Redis Queue)
+- ✅ Rate limiting implementado
+- ✅ Testes de integração implementados
+- ✅ CI/CD pipeline configurado (GitHub Actions)
+- ✅ Retry policy para serviços externos (Jobs com backoff)
+- ✅ Lock pessimista para prevenir race conditions
+- ✅ Enums para type safety
+- ✅ FormRequest para validação robusta
+- ✅ Análise estática (PHPStan) e formatação (Laravel Pint)
 
 ## 📄 Licença
 
