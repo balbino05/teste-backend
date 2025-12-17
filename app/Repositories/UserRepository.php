@@ -32,13 +32,18 @@ class UserRepository
         });
     }
 
-    public function invalidateCache(int $userId): void
+    public function invalidateCache(User $user): void
+    {
+        Cache::forget("user.{$user->id}");
+        Cache::forget("user.cpf.{$user->cpf}");
+        Cache::forget("user.email.{$user->email}");
+    }
+
+    public function invalidateCacheById(int $userId): void
     {
         $user = User::find($userId);
         if ($user) {
-            Cache::forget("user.{$userId}");
-            Cache::forget("user.cpf.{$user->cpf}");
-            Cache::forget("user.email.{$user->email}");
+            $this->invalidateCache($user);
         }
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TransferRequest;
 use App\Services\TransferService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class TransferController extends Controller
@@ -16,15 +16,9 @@ class TransferController extends Controller
     ) {
     }
 
-    public function transfer(Request $request): JsonResponse
+    public function transfer(TransferRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'value' => 'required|numeric|min:0.01',
-                'payer' => 'required|integer|exists:users,id',
-                'payee' => 'required|integer|exists:users,id',
-            ]);
-
             $transaction = $this->transferService->transfer(
                 (int) $request->input('payer'),
                 (int) $request->input('payee'),
@@ -33,7 +27,7 @@ class TransferController extends Controller
 
             return response()->json([
                 'transaction_id' => $transaction->id,
-                'status' => $transaction->status,
+                'status' => $transaction->status->value,
                 'message' => 'Transfer completed successfully',
             ], 201);
         } catch (\DomainException $e) {

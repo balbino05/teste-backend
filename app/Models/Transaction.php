@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\TransactionStatus as Status;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,7 @@ class Transaction extends Model
 
     protected $casts = [
         'value' => 'decimal:2',
+        'status' => Status::class,
     ];
 
     public function payer(): BelongsTo
@@ -37,34 +39,49 @@ class Transaction extends Model
 
     public function markAsCompleted(string $authorizationCode): void
     {
-        $this->status = 'completed';
+        $this->status = Status::COMPLETED;
         $this->authorization_code = $authorizationCode;
     }
 
     public function markAsFailed(string $errorMessage): void
     {
-        $this->status = 'failed';
+        $this->status = Status::FAILED;
         $this->error_message = $errorMessage;
     }
 
     public function markAsReversed(): void
     {
-        $this->status = 'reversed';
+        $this->status = Status::REVERSED;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === 'completed';
+        return $this->status === Status::COMPLETED;
     }
 
     public function isFailed(): bool
     {
-        return $this->status === 'failed';
+        return $this->status === Status::FAILED;
     }
 
     public function isReversed(): bool
     {
-        return $this->status === 'reversed';
+        return $this->status === Status::REVERSED;
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', Status::COMPLETED);
+    }
+
+    public function scopeFailed($query)
+    {
+        return $query->where('status', Status::FAILED);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', Status::PENDING);
     }
 }
 

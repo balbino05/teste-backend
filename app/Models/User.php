@@ -49,7 +49,9 @@ class User extends Model
             throw new \DomainException('Insufficient balance');
         }
 
-        $this->balance = (float) $this->balance - $amount;
+        // Usa decrement para melhor precisão e evitar race conditions
+        // O decrement atualiza o banco e o modelo automaticamente
+        $this->decrement('balance', $amount);
     }
 
     public function credit(float $amount): void
@@ -58,7 +60,9 @@ class User extends Model
             throw new \DomainException('Amount must be greater than zero');
         }
 
-        $this->balance = (float) $this->balance + $amount;
+        // Usa increment para melhor precisão e evitar race conditions
+        // O increment atualiza o banco e o modelo automaticamente
+        $this->increment('balance', $amount);
     }
 }
 

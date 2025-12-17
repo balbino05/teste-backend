@@ -24,9 +24,9 @@ class TransferService
     public function transfer(int $payerId, int $payeeId, float $value): Transaction
     {
         return DB::transaction(function () use ($payerId, $payeeId, $value) {
-            // Busca usuários (com cache)
-            $payer = $this->userRepository->findById($payerId);
-            $payee = $this->userRepository->findById($payeeId);
+            // Lock pessimista para prevenir race conditions
+            $payer = User::where('id', $payerId)->lockForUpdate()->first();
+            $payee = User::where('id', $payeeId)->lockForUpdate()->first();
 
             if (!$payer || !$payee) {
                 throw new \DomainException('User not found');
@@ -40,7 +40,7 @@ class TransferService
                 'payer_id' => $payerId,
                 'payee_id' => $payeeId,
                 'value' => $value,
-                'status' => 'pending',
+                'status' => \App\Enums\TransactionStatus::PENDING,
             ]);
 
             // Autoriza a transação
@@ -50,17 +50,14 @@ class TransferService
                 throw new \DomainException('Transaction not authorized');
             }
 
-            // Executa a transferência
+            // Executa a transferência usando métodos do modelo
+            // Lock já garante que não há race condition, mas métodos validam também
             $payer->debit($value);
             $payee->credit($value);
 
-            // Salva os saldos atualizados
-            $payer->save();
-            $payee->save();
-
-            // Invalida cache dos usuários
-            $this->userRepository->invalidateCache($payerId);
-            $this->userRepository->invalidateCache($payeeId);
+            // Invalida cache dos usuários (passando os objetos para evitar query extra)
+            $this->userRepository->invalidateCache($payer);
+            $this->userRepository->invalidateCache($payee);
 
             // Marca transação como concluída
             $transaction->markAsCompleted('AUT-' . uniqid());
@@ -95,14 +92,9 @@ class TransferService
             throw new \DomainException('Insufficient balance');
         }
 
-        // Valida valor
+        // Valida valor (já validado no FormRequest, mas mantido como segurança adicional)
         if ($value <= 0) {
             throw new \DomainException('Transfer value must be greater than zero');
-        }
-
-        // Não pode transferir para si mesmo
-        if ($payer->id === $payee->id) {
-            throw new \DomainException('Cannot transfer to yourself');
         }
     }
 }
