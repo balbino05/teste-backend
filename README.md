@@ -37,22 +37,26 @@ O projeto foi desenvolvido seguindo os princípios SOLID e Design Patterns, com 
 ## 🔧 Instalação
 
 1. Clone o repositório:
+
 ```bash
 git clone <seu-repositorio>
 cd teste
 ```
 
 2. Copie o arquivo de ambiente:
+
 ```bash
 cp .env.example .env
 ```
 
 3. Inicie os containers:
+
 ```bash
 docker-compose up -d
 ```
 
 4. Instale as dependências e configure:
+
 ```bash
 docker-compose exec php-cli composer install
 docker-compose exec php-cli php artisan key:generate
@@ -64,11 +68,12 @@ docker-compose exec php-cli php artisan db:seed
 
 ## 📝 Endpoints
 
-### POST /api/transfer
+### POST /transfer
 
 Realiza uma transferência entre dois usuários.
 
 **Request:**
+
 ```json
 {
   "value": 100.0,
@@ -78,6 +83,7 @@ Realiza uma transferência entre dois usuários.
 ```
 
 **Response (Sucesso - 201):**
+
 ```json
 {
   "transaction_id": 1,
@@ -87,6 +93,7 @@ Realiza uma transferência entre dois usuários.
 ```
 
 **Response (Erro - 400):**
+
 ```json
 {
   "error": "Insufficient balance"
@@ -98,6 +105,7 @@ Realiza uma transferência entre dois usuários.
 Verifica o status da aplicação.
 
 **Response:**
+
 ```json
 {
   "status": "ok"
@@ -121,6 +129,7 @@ docker-compose exec php-cli vendor/bin/phpunit
 ## 📊 Estrutura do Banco de Dados
 
 ### Tabela `users`
+
 - `id`: ID único do usuário
 - `name`: Nome completo
 - `cpf`: CPF (único)
@@ -132,6 +141,7 @@ docker-compose exec php-cli vendor/bin/phpunit
 - `updated_at`: Data de atualização
 
 ### Tabela `transactions`
+
 - `id`: ID único da transação
 - `payer_id`: ID do pagador
 - `payee_id`: ID do recebedor
@@ -154,11 +164,13 @@ docker-compose exec php-cli vendor/bin/phpunit
 ## 🔌 Serviços Externos
 
 ### Serviço de Autorização
+
 - **URL**: `https://util.devi.tools/api/v2/authorize`
 - **Método**: GET
 - **Retorno**: `{ "message": "Autorizado" }` quando autoriza
 
 ### Serviço de Notificação
+
 - **URL**: `https://util.devi.tools/api/v1/notify`
 - **Método**: POST
 - **Body**: `{ "user_id": 1, "message": "..." }`
@@ -192,4 +204,3 @@ docker-compose exec php-cli vendor/bin/phpunit
 ## 📄 Licença
 
 Este projeto foi desenvolvido como parte de um desafio técnico.
-

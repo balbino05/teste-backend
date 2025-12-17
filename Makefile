@@ -17,7 +17,7 @@ install: ## Instala as dependências do Composer
 	docker-compose exec php-cli composer install
 
 seed: ## Popula o banco de dados com dados de teste
-	docker-compose exec php-cli php scripts/seed.php
+	docker-compose exec php-cli php artisan db:seed
 
 test: ## Executa os testes
 	docker-compose exec php-cli composer test
@@ -28,22 +28,22 @@ test-unit: ## Executa apenas testes unitários
 logs: ## Mostra os logs da aplicação
 	docker-compose logs -f php-cli
 
-logs-app: ## Mostra os logs do arquivo app.log
-	tail -f logs/app.log
+logs-app: ## Mostra os logs do Laravel
+	docker-compose exec php-cli tail -f storage/logs/laravel.log
 
-phpstan: ## Executa análise estática com PHPStan
-	docker-compose exec php-cli composer phpstan
+migrate: ## Executa as migrations
+	docker-compose exec php-cli php artisan migrate
 
-cs-check: ## Verifica o código com PHP CodeSniffer
-	docker-compose exec php-cli composer cs-check
+migrate-fresh: ## Recria o banco de dados e executa migrations
+	docker-compose exec php-cli php artisan migrate:fresh --seed
 
-cs-fix: ## Corrige automaticamente problemas de código
-	docker-compose exec php-cli composer cs-fix
+pint: ## Formata o código com Laravel Pint
+	docker-compose exec php-cli composer pint
 
 clean: ## Remove containers e volumes
 	docker-compose down -v
 	rm -rf vendor/
 	rm -rf .phpunit.cache/
 
-restart: down up install seed ## Reinicia tudo (para, inicia, instala e popula banco)
+restart: down up install migrate seed ## Reinicia tudo (para, inicia, instala, migra e popula banco)
 
