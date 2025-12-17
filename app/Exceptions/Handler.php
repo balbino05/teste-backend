@@ -54,15 +54,10 @@ class Handler extends ExceptionHandler
                 ], 400);
             }
 
-            // Em ambiente de teste, retornar mais informações sobre o erro
-            if (app()->environment('testing')) {
-                return response()->json([
-                    'error' => $e->getMessage(),
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                    'trace' => $e->getTraceAsString(),
-                ], 500);
-            }
+            // Retornar erro genérico para outras exceções
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
         }
 
         return parent::render($request, $e);
