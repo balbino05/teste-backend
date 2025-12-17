@@ -40,6 +40,18 @@ migrate-fresh: ## Recria o banco de dados e executa migrations
 pint: ## Formata o código com Laravel Pint
 	docker-compose exec php-cli composer pint
 
+phpstan: ## Executa análise estática com PHPStan
+	docker-compose exec php-cli composer phpstan
+
+analyse: ## Executa todas as análises de código
+	docker-compose exec php-cli composer analyse
+
+queue-work: ## Inicia o worker de filas manualmente
+	docker-compose exec queue-worker php artisan queue:work redis --verbose
+
+queue-restart: ## Reinicia o worker de filas
+	docker-compose restart queue-worker
+
 clean: ## Remove containers e volumes
 	docker-compose down -v
 	rm -rf vendor/

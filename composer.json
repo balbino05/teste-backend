@@ -9,7 +9,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0",
-        "laravel/pint": "^1.0"
+        "laravel/pint": "^1.0",
+        "nunomaduro/larastan": "^2.6"
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +26,12 @@
     },
     "scripts": {
         "test": "phpunit",
-        "pint": "pint"
+        "pint": "pint",
+        "phpstan": "phpstan analyse",
+        "analyse": [
+            "@phpstan",
+            "@pint"
+        ]
     },
     "config": {
         "optimize-autoloader": true,

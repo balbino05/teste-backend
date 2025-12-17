@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\UserRepository;
 use App\Services\External\AuthorizationService;
 use App\Services\External\AuthorizationServiceInterface;
 use App\Services\External\NotificationService;
@@ -26,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
                 config('services.notify.url')
             );
         });
+
+        $this->app->singleton(UserRepository::class);
     }
 
     public function boot(): void

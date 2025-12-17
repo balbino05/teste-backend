@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Jobs\SendNotificationJob;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class TransferTest extends TestCase
@@ -15,6 +17,8 @@ class TransferTest extends TestCase
 
     public function testTransferBetweenCommonUsers(): void
     {
+        Queue::fake();
+
         $payer = User::factory()->create([
             'user_type' => 'common',
             'balance' => 1000.00,
@@ -27,7 +31,6 @@ class TransferTest extends TestCase
 
         Http::fake([
             'util.devi.tools/api/v2/authorize' => Http::response(['message' => 'Autorizado'], 200),
-            'util.devi.tools/api/v1/notify' => Http::response([], 200),
         ]);
 
         $response = $this->postJson('/transfer', [
@@ -45,10 +48,14 @@ class TransferTest extends TestCase
 
         $this->assertEquals(900.00, (float) $payer->fresh()->balance);
         $this->assertEquals(100.00, (float) $payee->fresh()->balance);
+
+        Queue::assertPushed(SendNotificationJob::class);
     }
 
     public function testTransferFromCommonToMerchant(): void
     {
+        Queue::fake();
+
         $payer = User::factory()->create([
             'user_type' => 'common',
             'balance' => 500.00,
@@ -61,7 +68,6 @@ class TransferTest extends TestCase
 
         Http::fake([
             'util.devi.tools/api/v2/authorize' => Http::response(['message' => 'Autorizado'], 200),
-            'util.devi.tools/api/v1/notify' => Http::response([], 200),
         ]);
 
         $response = $this->postJson('/transfer', [
@@ -73,6 +79,8 @@ class TransferTest extends TestCase
         $response->assertStatus(201);
         $this->assertEquals(450.00, (float) $payer->fresh()->balance);
         $this->assertEquals(50.00, (float) $payee->fresh()->balance);
+
+        Queue::assertPushed(SendNotificationJob::class);
     }
 
     public function testTransferFailsWhenMerchantTriesToSend(): void

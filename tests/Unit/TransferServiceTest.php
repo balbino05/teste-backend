@@ -6,10 +6,11 @@ namespace Tests\Unit;
 
 use App\Models\Transaction;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use App\Services\External\AuthorizationServiceInterface;
-use App\Services\External\NotificationServiceInterface;
 use App\Services\TransferService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class TransferServiceTest extends TestCase
@@ -17,18 +18,16 @@ class TransferServiceTest extends TestCase
     use RefreshDatabase;
 
     private AuthorizationServiceInterface $authorizationService;
-    private NotificationServiceInterface $notificationService;
     private TransferService $transferService;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->authorizationService = $this->createMock(AuthorizationServiceInterface::class);
-        $this->notificationService = $this->createMock(NotificationServiceInterface::class);
+        Queue::fake();
 
+        $this->authorizationService = $this->createMock(AuthorizationServiceInterface::class);
         $this->app->instance(AuthorizationServiceInterface::class, $this->authorizationService);
-        $this->app->instance(NotificationServiceInterface::class, $this->notificationService);
 
         $this->transferService = app(TransferService::class);
     }
@@ -85,15 +84,14 @@ class TransferServiceTest extends TestCase
             ->method('authorize')
             ->willReturn(true);
 
-        $this->notificationService->expects($this->once())
-            ->method('notify')
-            ->willReturn(true);
-
         $transaction = $this->transferService->transfer($payer->id, $payee->id, 50.0);
 
         $this->assertInstanceOf(Transaction::class, $transaction);
         $this->assertTrue($transaction->isCompleted());
         $this->assertEquals(50.0, (float) $payer->fresh()->balance);
         $this->assertEquals(50.0, (float) $payee->fresh()->balance);
+
+        // Verifica que a notificação foi enfileirada
+        Queue::assertPushed(\App\Jobs\SendNotificationJob::class);
     }
 }
