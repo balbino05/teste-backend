@@ -17,7 +17,7 @@ except ImportError:
     sys.exit(1)
 
 def main():
-    repo_name = sys.argv[1] if len(sys.argv) > 1 else "teste-picpay"
+    repo_name = sys.argv[1] if len(sys.argv) > 1 else "teste-backend"
 
     # Tentar obter token de variável de ambiente ou pedir ao usuário
     token = os.getenv("GITHUB_TOKEN")
@@ -41,7 +41,7 @@ def main():
         # Criar repositório privado
         repo = user.create_repo(
             repo_name,
-            description="Desafio Back-end PicPay - Plataforma de pagamentos simplificada",
+            description="Teste Back-end - Plataforma de pagamentos simplificada",
             private=True,
             auto_init=False
         )

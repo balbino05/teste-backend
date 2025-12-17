@@ -3,7 +3,7 @@
 # Script para criar repositório no GitHub e fazer push
 # Uso: ./scripts/deploy-to-github.sh [nome-do-repositorio]
 
-REPO_NAME="${1:-teste-picpay}"
+REPO_NAME="${1:-teste-backend}"
 GITHUB_USER=$(git config user.name | tr ' ' '-' | tr '[:upper:]' '[:lower:]' 2>/dev/null || echo "seu-usuario")
 
 echo "🚀 Criando repositório no GitHub: $REPO_NAME"
