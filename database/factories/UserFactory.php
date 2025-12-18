@@ -27,6 +27,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'user_type' => 'merchant',
+            'cpf' => fake()->numerify('##############'), // CNPJ tem 14 dígitos
         ]);
     }
 }

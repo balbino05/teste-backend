@@ -29,10 +29,10 @@ class DatabaseSeeder extends Seeder
             'balance' => 500.00,
         ]);
 
-        // Lojistas
+        // Lojistas (usam CNPJ - 14 dígitos)
         $merchant1 = User::create([
             'name' => 'Loja ABC',
-            'cpf' => '11223344556',
+            'cpf' => '00000000000191', // CNPJ válido (00.000.000/0001-91)
             'email' => 'loja@example.com',
             'password' => Hash::make('senha123'),
             'user_type' => 'merchant',
@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
 
         $merchant2 = User::create([
             'name' => 'Comércio XYZ',
-            'cpf' => '99887766554',
+            'cpf' => '11222333000181', // CNPJ válido (11.222.333/0001-81)
             'email' => 'comercio@example.com',
             'password' => Hash::make('senha123'),
             'user_type' => 'merchant',
