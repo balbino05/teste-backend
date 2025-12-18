@@ -17,7 +17,14 @@ class NotificationService implements NotificationServiceInterface
     public function notify(int $userId, string $message): bool
     {
         try {
-            $response = Http::timeout(5)->post($this->notifyUrl, [
+            // Em ambiente de desenvolvimento/teste, aceita certificados SSL inválidos
+            $httpClient = Http::timeout(5);
+
+            if (app()->environment(['local', 'testing'])) {
+                $httpClient = $httpClient->withoutVerifying();
+            }
+
+            $response = $httpClient->post($this->notifyUrl, [
                 'user_id' => $userId,
                 'message' => $message,
             ]);
@@ -36,6 +43,7 @@ class NotificationService implements NotificationServiceInterface
             Log::error('Notification service error', [
                 'user_id' => $userId,
                 'message' => $e->getMessage(),
+                'url' => $this->notifyUrl,
             ]);
 
             return false;

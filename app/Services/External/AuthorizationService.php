@@ -16,8 +16,23 @@ class AuthorizationService implements AuthorizationServiceInterface
 
     public function authorize(): bool
     {
+        // Em ambiente local/teste, permite mockar a autorização via variável de ambiente
+        if (app()->environment(['local', 'testing']) && env('MOCK_AUTHORIZATION', false)) {
+            Log::info('Authorization service mocked (always authorized)', [
+                'environment' => app()->environment(),
+            ]);
+            return true;
+        }
+
         try {
-            $response = Http::timeout(5)->get($this->authorizeUrl);
+            // Em ambiente de desenvolvimento/teste, aceita certificados SSL inválidos
+            $httpClient = Http::timeout(5);
+
+            if (app()->environment(['local', 'testing'])) {
+                $httpClient = $httpClient->withoutVerifying();
+            }
+
+            $response = $httpClient->get($this->authorizeUrl);
 
             $statusCode = $response->status();
             $body = $response->json();
@@ -35,6 +50,7 @@ class AuthorizationService implements AuthorizationServiceInterface
         } catch (\Exception $e) {
             Log::error('Authorization service error', [
                 'message' => $e->getMessage(),
+                'url' => $this->authorizeUrl,
             ]);
 
             return false;

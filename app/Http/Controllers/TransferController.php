@@ -32,9 +32,9 @@ class TransferController extends Controller
             ], 201);
         } catch (\DomainException $e) {
             try {
-                Log::warning('Transfer validation error', [
-                    'error' => $e->getMessage(),
-                ]);
+            Log::warning('Transfer validation error', [
+                'error' => $e->getMessage(),
+            ]);
             } catch (\Exception $logException) {
                 // Ignora erros de log
             }
@@ -44,10 +44,10 @@ class TransferController extends Controller
             ], 400);
         } catch (\Exception $e) {
             try {
-                Log::error('Transfer error', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
+            Log::error('Transfer error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             } catch (\Exception $logException) {
                 // Ignora erros de log
             }

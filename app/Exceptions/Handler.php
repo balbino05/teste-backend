@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -40,6 +41,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e)
     {
+        // Tratar AuthenticationException ANTES de qualquer outra coisa
+        // para evitar que o Laravel tente usar route('login') que não existe
+        if ($e instanceof AuthenticationException) {
+            // Sempre retornar JSON para APIs, mesmo sem header Accept
+            if ($request->is('api/*') || $request->expectsJson() || $request->isJson()) {
+                return response()->json([
+                    'error' => 'Usuário não autenticado',
+                ], 401);
+            }
+
+            // Para requisições web, retornar JSON também (evita route('login'))
+            return response()->json([
+                'error' => 'Usuário não autenticado',
+            ], 401);
+        }
+
         // Para requisições JSON, sempre retornar JSON
         if ($request->expectsJson() || $request->isJson()) {
             if ($e instanceof ValidationException) {
