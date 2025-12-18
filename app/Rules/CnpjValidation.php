@@ -8,59 +8,73 @@ use Illuminate\Contracts\Validation\Rule;
 
 class CnpjValidation implements Rule
 {
+    private const CNPJ_LENGTH = 14;
+    private const FIRST_DIGIT_POSITION = 12;
+    private const SECOND_DIGIT_POSITION = 13;
+    private const MIN_POSITION = 2;
+    private const MAX_POSITION = 9;
+
     public function passes($attribute, $value): bool
     {
-        $cnpj = preg_replace('/[^0-9]/', '', $value);
+        $cnpj = preg_replace('/[^0-9]/', '', (string) $value);
 
-        if (strlen($cnpj) !== 14) {
+        if (strlen($cnpj) !== self::CNPJ_LENGTH) {
             return false;
         }
 
-        // Verifica se todos os dígitos são iguais
-        if (preg_match('/(\d)\1{13}/', $cnpj)) {
+        if ($this->hasAllSameDigits($cnpj)) {
             return false;
         }
 
-        // Valida primeiro dígito verificador
-        $length = 12;
-        $digits = substr($cnpj, 0, $length);
-        $sum = 0;
-        $pos = $length - 7;
-
-        for ($i = 0; $i < $length; $i++) {
-            $sum += (int) $digits[$i] * $pos--;
-            if ($pos < 2) {
-                $pos = 9;
-            }
-        }
-
-        $result = $sum % 11 < 2 ? 0 : 11 - ($sum % 11);
-
-        if ($result !== (int) $cnpj[$length]) {
+        if (!$this->validateFirstDigit($cnpj)) {
             return false;
         }
 
-        // Valida segundo dígito verificador
-        $length = 13;
-        $digits = substr($cnpj, 0, $length);
-        $sum = 0;
-        $pos = $length - 7;
-
-        for ($i = 0; $i < $length; $i++) {
-            $sum += (int) $digits[$i] * $pos--;
-            if ($pos < 2) {
-                $pos = 9;
-            }
-        }
-
-        $result = $sum % 11 < 2 ? 0 : 11 - ($sum % 11);
-
-        return $result === (int) $cnpj[$length];
+        return $this->validateSecondDigit($cnpj);
     }
 
     public function message(): string
     {
         return 'O CNPJ informado é inválido.';
+    }
+
+    private function hasAllSameDigits(string $cnpj): bool
+    {
+        return (bool) preg_match('/(\d)\1{13}/', $cnpj);
+    }
+
+    private function validateFirstDigit(string $cnpj): bool
+    {
+        $expectedDigit = $this->calculateVerifierDigit($cnpj, self::FIRST_DIGIT_POSITION);
+        $actualDigit = (int) $cnpj[self::FIRST_DIGIT_POSITION];
+
+        return $expectedDigit === $actualDigit;
+    }
+
+    private function validateSecondDigit(string $cnpj): bool
+    {
+        $expectedDigit = $this->calculateVerifierDigit($cnpj, self::SECOND_DIGIT_POSITION);
+        $actualDigit = (int) $cnpj[self::SECOND_DIGIT_POSITION];
+
+        return $expectedDigit === $actualDigit;
+    }
+
+    private function calculateVerifierDigit(string $cnpj, int $length): int
+    {
+        $digits = substr($cnpj, 0, $length);
+        $sum = 0;
+        $pos = $length - 7;
+
+        for ($i = 0; $i < $length; $i++) {
+            $sum += (int) $digits[$i] * $pos--;
+            if ($pos < self::MIN_POSITION) {
+                $pos = self::MAX_POSITION;
+            }
+        }
+
+        $remainder = $sum % 11;
+
+        return $remainder < self::MIN_POSITION ? 0 : 11 - $remainder;
     }
 }
 
