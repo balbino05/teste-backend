@@ -16,7 +16,13 @@ class TransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'value' => 'required|numeric|min:0.01|max:999999.99',
+            'value' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:999999.99',
+                'regex:/^\d+(\.\d{1,2})?$/', // Garante formato monetário correto (máximo 2 casas decimais)
+            ],
             'payer' => 'required|integer|exists:users,id|different:payee',
             'payee' => 'required|integer|exists:users,id',
         ];
@@ -29,6 +35,7 @@ class TransferRequest extends FormRequest
             'value.numeric' => 'O valor deve ser um número',
             'value.min' => 'O valor mínimo é R$ 0,01',
             'value.max' => 'O valor máximo é R$ 999.999,99',
+            'value.regex' => 'O valor deve ter no máximo 2 casas decimais',
             'payer.required' => 'O pagador é obrigatório',
             'payer.exists' => 'Pagador não encontrado',
             'payer.different' => 'Não é possível transferir para si mesmo',

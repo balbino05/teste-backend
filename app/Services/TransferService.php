@@ -23,13 +23,21 @@ class TransferService
     public function transfer(int $payerId, int $payeeId, float $value): Transaction
     {
         return DB::transaction(function () use ($payerId, $payeeId, $value) {
-            // Lock pessimista para prevenir race conditions
-            $payer = User::where('id', $payerId)->lockForUpdate()->first();
-            $payee = User::where('id', $payeeId)->lockForUpdate()->first();
+            // Lock pessimista com ordem determinística para prevenir deadlocks
+            // Sempre lockar pelo menor ID primeiro para evitar deadlocks em transferências simultâneas
+            $ids = [$payerId, $payeeId];
+            sort($ids);
 
-            if (!$payer || !$payee) {
+            $firstUser = User::where('id', $ids[0])->lockForUpdate()->first();
+            $secondUser = User::where('id', $ids[1])->lockForUpdate()->first();
+
+            if (!$firstUser || !$secondUser) {
                 throw new \DomainException('User not found');
             }
+
+            // Identifica payer e payee após lock e validação
+            $payer = $firstUser->id === $payerId ? $firstUser : $secondUser;
+            $payee = $firstUser->id === $payeeId ? $firstUser : $secondUser;
 
             // Validações de negócio
             $this->validateTransfer($payer, $payee, $value);
@@ -42,17 +50,35 @@ class TransferService
                 'status' => \App\Enums\TransactionStatus::PENDING,
             ]);
 
-            // Autoriza a transação
-            if (!$this->authorizationService->authorize()) {
-                $transaction->markAsFailed('Transaction not authorized');
-                $transaction->save();
-                throw new \DomainException('Transaction not authorized');
+            try {
+                // Autoriza a transação
+                if (!$this->authorizationService->authorize()) {
+                    $transaction->markAsFailed('Transaction not authorized');
+                    $transaction->save();
+                    throw new \DomainException('Transaction not authorized');
+                }
+            } catch (\Exception $e) {
+                // Garante que transação seja marcada como failed em caso de erro na autorização
+                if (!$transaction->isFailed()) {
+                    $transaction->markAsFailed('Authorization service error: ' . $e->getMessage());
+                    $transaction->save();
+                }
+                throw $e;
             }
 
             // Executa a transferência usando métodos do modelo
             // Lock já garante que não há race condition, mas métodos validam também
-            $payer->debit($value);
-            $payee->credit($value);
+            try {
+                $payer->debit($value);
+                $payee->credit($value);
+            } catch (\Exception $e) {
+                // Em caso de erro no débito/crédito, marca transação como failed antes de relançar
+                if (!$transaction->isFailed()) {
+                    $transaction->markAsFailed('Transfer execution error: ' . $e->getMessage());
+                    $transaction->save();
+                }
+                throw $e;
+            }
 
             // Invalida cache dos usuários (passando os objetos para evitar query extra)
             $this->userRepository->invalidateCache($payer);
