@@ -1,8 +1,11 @@
-.PHONY: help up down build install seed test logs clean
+.PHONY: help up down build install seed test logs clean setup
 
 help: ## Mostra esta mensagem de ajuda
 	@echo "Comandos disponíveis:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+setup: ## Setup completo do projeto (build, install, migrate, seed)
+	@./scripts/setup.sh
 
 up: ## Inicia os containers Docker
 	docker-compose up -d

@@ -3,8 +3,8 @@
     "description": "Teste Back-end - Plataforma de pagamentos",
     "type": "project",
     "require": {
-        "php": "^8.1",
-        "laravel/framework": "^10.0",
+        "php": "^8.3",
+        "laravel/framework": "^11.0",
         "guzzlehttp/guzzle": "^7.8"
     },
     "require-dev": {

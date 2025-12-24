@@ -21,8 +21,8 @@ O projeto foi desenvolvido seguindo os princípios SOLID e Design Patterns, com 
 
 ## 🚀 Tecnologias
 
-- **PHP 8.1+**
-- **Laravel 10**: Framework PHP moderno e robusto
+- **PHP 8.3+**
+- **Laravel 11**: Framework PHP moderno e robusto
 - **Eloquent ORM**: ORM elegante para banco de dados
 - **Guzzle HTTP**: Cliente HTTP para serviços externos
 - **PHPUnit**: Testes unitários e de integração
@@ -31,10 +31,26 @@ O projeto foi desenvolvido seguindo os princípios SOLID e Design Patterns, com 
 ## 📋 Requisitos
 
 - Docker e Docker Compose
-- PHP 8.1+ (para desenvolvimento local)
+- PHP 8.3+ (para desenvolvimento local)
 - Composer (para desenvolvimento local)
 
 ## 🔧 Instalação
+
+### Setup Automático (Recomendado)
+
+Execute o script de setup que automatiza todo o processo:
+
+```bash
+./scripts/setup.sh
+```
+
+Ou usando Make:
+
+```bash
+make setup
+```
+
+### Setup Manual
 
 1. Clone o repositório:
 
@@ -43,19 +59,13 @@ git clone <seu-repositorio>
 cd teste
 ```
 
-2. Copie o arquivo de ambiente:
-
-```bash
-cp .env.example .env
-```
-
-3. Inicie os containers:
+2. Inicie os containers:
 
 ```bash
 docker-compose up -d
 ```
 
-4. Instale as dependências e configure:
+3. Instale as dependências e configure:
 
 ```bash
 docker-compose exec php-cli composer install
@@ -64,7 +74,7 @@ docker-compose exec php-cli php artisan migrate
 docker-compose exec php-cli php artisan db:seed
 ```
 
-5. A aplicação estará disponível em: `http://localhost:8000`
+4. A aplicação estará disponível em: `http://localhost:8001`
 
 ## 📝 Endpoints
 
@@ -114,16 +124,35 @@ Verifica o status da aplicação.
 
 ## 🧪 Testes
 
-Execute os testes com:
+Execute todos os testes:
 
 ```bash
-docker-compose exec php-cli composer test
+make test
 ```
 
 Ou diretamente:
 
 ```bash
-docker-compose exec php-cli vendor/bin/phpunit
+docker-compose exec php-cli composer test
+```
+
+### Estrutura de Testes
+
+- **Testes Unitários** (`tests/Unit/`): Testam lógica isolada sem dependências do framework
+- **Testes de Integração** (`tests/Feature/`): Testam integração com banco de dados e serviços externos
+
+Execute apenas testes unitários:
+
+```bash
+make test-unit
+```
+
+### Cobertura de Código
+
+Para gerar relatório de cobertura:
+
+```bash
+docker-compose exec php-cli vendor/bin/phpunit --coverage-html coverage
 ```
 
 ## 📊 Estrutura do Banco de Dados
@@ -177,29 +206,42 @@ docker-compose exec php-cli vendor/bin/phpunit
 
 ## 🎯 Melhorias Implementadas
 
+### Arquitetura e Código
 - ✅ Arquitetura limpa com separação de responsabilidades
 - ✅ Aplicação de SOLID principles
 - ✅ Design Patterns (Repository, Service, Factory)
-- ✅ Tratamento robusto de erros
-- ✅ Transações de banco de dados
-- ✅ Logging estruturado
-- ✅ Testes unitários
-- ✅ Docker e Docker Compose
-- ✅ Validações de negócio
-- ✅ Integração resiliente com serviços externos
+- ✅ Uso consistente do Repository Pattern (sem chamadas diretas ao Model)
+- ✅ Métodos pequenos e focados (refatoração do TransferService)
+- ✅ Código limpo sem comentários excessivos
 
-## 📈 Melhorias Implementadas
+### Qualidade e Testes
+- ✅ Testes unitários verdadeiros (sem dependência do framework)
+- ✅ Separação clara entre testes unitários e de integração
+- ✅ Cobertura de código configurada
+- ✅ Análise estática (PHPStan) e formatação (Laravel Pint)
 
+### Infraestrutura
+- ✅ Versões atualizadas: PHP 8.3 e Laravel 11
+- ✅ Setup automatizado com script único
+- ✅ Docker e Docker Compose configurados
 - ✅ Cache Redis para consultas frequentes
 - ✅ Fila de mensageria para notificações assíncronas (Redis Queue)
-- ✅ Rate limiting implementado
-- ✅ Testes de integração implementados
 - ✅ CI/CD pipeline configurado (GitHub Actions)
-- ✅ Retry policy para serviços externos (Jobs com backoff)
+
+### Segurança e Performance
 - ✅ Lock pessimista para prevenir race conditions
+- ✅ Cache Redis com invalidação correta
+- ✅ Transações de banco de dados
+- ✅ Tratamento robusto de erros
+- ✅ Validações de negócio
+- ✅ Integração resiliente com serviços externos
+- ✅ Rate limiting implementado
+- ✅ Retry policy para serviços externos (Jobs com backoff)
+
+### Outros
+- ✅ Logging estruturado
 - ✅ Enums para type safety
 - ✅ FormRequest para validação robusta
-- ✅ Análise estática (PHPStan) e formatação (Laravel Pint)
 
 ## 📄 Licença
 

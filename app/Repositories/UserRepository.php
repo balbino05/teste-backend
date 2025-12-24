@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 
 class UserRepository
 {
-    private const CACHE_TTL = 3600; // 1 hora
+    private const CACHE_TTL = 3600;
 
     public function findById(int $id): ?User
     {
@@ -45,6 +45,19 @@ class UserRepository
         if ($user) {
             $this->invalidateCache($user);
         }
+    }
+
+    public function findByIdWithLock(int $id): ?User
+    {
+        Cache::forget("user.{$id}");
+        return User::where('id', $id)->lockForUpdate()->first();
+    }
+
+    public function create(array $data): User
+    {
+        $user = User::create($data);
+        $this->invalidateCache($user);
+        return $user;
     }
 }
 

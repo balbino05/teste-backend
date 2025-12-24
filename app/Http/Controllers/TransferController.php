@@ -36,7 +36,6 @@ class TransferController extends Controller
                 'error' => $e->getMessage(),
             ]);
             } catch (\Exception $logException) {
-                // Ignora erros de log
             }
 
             return response()->json([
@@ -49,7 +48,6 @@ class TransferController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
             } catch (\Exception $logException) {
-                // Ignora erros de log
             }
 
             return response()->json([

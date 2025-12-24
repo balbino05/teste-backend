@@ -50,8 +50,6 @@ class User extends Authenticatable
             throw new \DomainException('Insufficient balance');
         }
 
-        // Usa decrement para melhor precisão e evitar race conditions
-        // O decrement atualiza o banco e o modelo automaticamente
         $this->decrement('balance', $amount);
     }
 
@@ -61,8 +59,6 @@ class User extends Authenticatable
             throw new \DomainException('Amount must be greater than zero');
         }
 
-        // Usa increment para melhor precisão e evitar race conditions
-        // O increment atualiza o banco e o modelo automaticamente
         $this->increment('balance', $amount);
     }
 }

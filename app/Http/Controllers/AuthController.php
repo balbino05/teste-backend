@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,10 +14,15 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private UserRepository $userRepository
+    ) {
+    }
+
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            $user = User::create([
+            $user = $this->userRepository->create([
                 'name' => $request->input('name'),
                 'email' => $request->input('email'),
                 'cpf' => $request->input('cpf'),
@@ -49,7 +54,6 @@ class AuthController extends Controller
                     'trace' => $e->getTraceAsString(),
                 ]);
             } catch (\Exception $logException) {
-                // Ignora erros de log
             }
 
             return response()->json([
@@ -70,9 +74,6 @@ class AuthController extends Controller
             }
 
             $user = Auth::user();
-
-            // Gera um token simples usando hash do user ID + timestamp
-            // Em produção, use Laravel Sanctum ou Passport
             $token = hash('sha256', $user->id . '-' . time() . '-' . config('app.key'));
 
             Log::info('User logged in successfully', [
@@ -98,7 +99,6 @@ class AuthController extends Controller
                     'trace' => $e->getTraceAsString(),
                 ]);
             } catch (\Exception $logException) {
-                // Ignora erros de log
             }
 
             return response()->json([
@@ -133,7 +133,6 @@ class AuthController extends Controller
                     'trace' => $e->getTraceAsString(),
                 ]);
             } catch (\Exception $logException) {
-                // Ignora erros de log
             }
 
             return response()->json([
